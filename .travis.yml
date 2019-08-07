@@ -7,4 +7,4 @@ go:
 
 go_import_path: fast
 
-script: go test -v ./... -tags "jaeger" -race -cover
+script: go test -v ./... -race -cover
