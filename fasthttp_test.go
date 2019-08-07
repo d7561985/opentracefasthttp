@@ -56,7 +56,8 @@ func TestCarrier(t *testing.T) {
 	req.Header.SetMethod(fasthttp.MethodGet)
 	req.SetRequestURI("http://example.com")
 
-	err = opentracing.GlobalTracer().Inject(span.Context(), opentracing.HTTPHeaders, opentracefasthttp.New(&req.Header))
+	carrier := opentracefasthttp.New(&req.Header)
+	err = opentracing.GlobalTracer().Inject(span.Context(), opentracing.HTTPHeaders, carrier)
 	assert.NoError(t, err)
 
 	client := fasthttp.Client{Dial: func(addr string) (net.Conn, error) {
