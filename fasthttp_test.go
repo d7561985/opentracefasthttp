@@ -4,8 +4,11 @@
 package opentracefasthttp_test
 
 import (
+	"fmt"
 	"net"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/d7561985/opentracefasthttp"
 	"github.com/opentracing/opentracing-go"
@@ -18,7 +21,11 @@ import (
 	"github.com/valyala/fasthttp/fasthttputil"
 )
 
+const JaegerURL = "http://localhost:16686"
+
 func TestCarrier(t *testing.T) {
+	waitJaeger()
+
 	// we need real trace connection
 	cfg, err := config.FromEnv()
 	assert.NoError(t, err)
@@ -67,4 +74,33 @@ func TestCarrier(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.True(t, ok)
+}
+
+func waitJaeger() {
+	res := make(chan struct{})
+	go checkJaeger(res)
+
+	select {
+
+	case <-time.After(time.Minute):
+		panic("no connection")
+	case <-res:
+		fmt.Println("Jaeger has found")
+		return
+	}
+}
+
+func checkJaeger(res chan<- struct{}) {
+	request, err := http.NewRequest("GET", JaegerURL, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		if response, err := http.DefaultClient.Do(request); err == nil && response.StatusCode == http.StatusOK {
+			res <- struct{}{}
+			return
+		}
+		time.Sleep(time.Second)
+	}
 }
