@@ -1,4 +1,4 @@
-// build jaeger
+// +build jaeger
 
 // test
 package opentracefasthttp_test
@@ -56,6 +56,8 @@ func TestCarrier(t *testing.T) {
 	go srv.Serve(ln) //nolint
 
 	span := opentracing.GlobalTracer().StartSpan("client-request")
+	defer span.Finish()
+
 	span.SetTag("test", "test")
 	span.LogFields(log.String("test", "test"))
 
