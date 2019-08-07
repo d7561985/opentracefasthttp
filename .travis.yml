@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - 1.12.x
+  - master
+
+go_import_path: fast
+script: go test -v ./...

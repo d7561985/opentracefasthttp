@@ -1,0 +1,26 @@
+version: 3
+
+services:
+  jaegertracing:
+    image: jaegertracing/all-in-one:1.13
+    environment:
+      COLLECTOR_ZIPKIN_HTTP_PORT:9411
+    command: start --insecure --cache=1GB --max-sql-memory=1GB
+    #    ports:
+      #  5775:5775/udp \
+      # 6831:6831/udp \
+      # -p 6832:6832/udp \
+      # -p 5778:5778 \
+      # -p 16686:16686 \
+      # -p 14268:14268 \
+      # -p 9411:9411 \
+    healthcheck:
+      test: ./cockroach node status --insecure
+      interval: 30s
+      timeout: 10s
+      retries: 60
+
+jaeger:
+  docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+
